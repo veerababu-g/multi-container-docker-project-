@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Docker Multi-Container Project</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef2f7;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            max-width: 450px;
+            margin: auto;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 12px;
+            margin: 8px;
+            width: 80%;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Docker Multi-Container Application</h1>
+
+    <h3>Add User</h3>
+
+    <input id="name" placeholder="Enter your name">
+    <input id="email" placeholder="Enter your email">
+
+    <br><br>
+
+    <button onclick="addUser()">Save User</button>
+
+    <h3>Saved Users</h3>
+
+    <button onclick="getUsers()">View Users</button>
+
+    <ul id="users"></ul>
+</div>
+
+<script>
+async function addUser() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+
+    const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        alert(result.error || "Unable to save user");
+        return;
+    }
+
+    alert("User saved successfully!");
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+
+    getUsers();
+}
+
+async function getUsers() {
+    const response = await fetch("/api/users");
+    const users = await response.json();
+
+    const list = document.getElementById("users");
+    list.innerHTML = "";
+
+    users.forEach(user => {
+        const li = document.createElement("li");
+        li.textContent = user.name + " - " + user.email;
+        list.appendChild(li);
+    });
+}
+
+getUsers();
+</script>
+
+</body>
+</html>
